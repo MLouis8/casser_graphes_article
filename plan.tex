@@ -1,0 +1,94 @@
+\documentclass{article}
+
+\usepackage{graphicx}
+\graphicspath{{images/}}
+
+\begin{document}
+
+\section{Intro}
+
+\section{Related Works}
+
+\section{Choix modélisation}
+\subsection{Graphe}
+\begin{itemize}
+    \item Osmnx donc données d'OSM ave granularité de 4m car moyenne des rues Parisiennes
+    \item Limites du modèle
+    \item paramètres de preprocessing pour repoductibilité ? (driveway, projection, buffer...)
+    \item contrainte de KaHIP $\rightarrow$ graphe non orienté\\
+    Donc toutes les coupes sont faites sur le graphe non orienté. Lorsque le graphe orienté est évoqué (notamment lors de l'analyse des composantes fortement connexes) on 'désoriente le graphe'
+    
+\end{itemize}
+
+\subsection{Valuation}
+Valuation par les lanes, osmnx et limites de osm et de la valuation.\\
+\textbf{Différence entre non valué et valué pour la eBC ?}\\
+ou\\
+\textbf{Carte des coûts ?}\\
+ou\\
+\textbf{Distribution des coûts ?}
+
+\section{Coupes}
+\begin{itemize}
+    \item Coupes nat. dans les villes
+    \item KaHIP
+    \begin{itemize}
+        \item[-] coupe équilibrée, imbalance
+        \item[-] composantes connexes $\rightarrow$ phénomènes étranges
+        \item[-] \underline{clusters de coupes $\rightarrow$ fréquence et diversité des coupes}
+        \item[-] efficacité de l'algo (pourquoi baser une stratégie dessus est intéressant)
+    \end{itemize}
+    \textbf{Coupe 190 (et 24 et 141 ?), avec nb d'arêtes enlevées et poid}
+    \item \underline{Clustering de coupe:}
+    \begin{itemize}
+        \item[-] Méthode, distance de Chamfer, algo de clustering (Louvain et BIRCH modifié ou BallTree)
+        \item[-] Résultats sur plusieurs valuations, diversité des coupes 
+    \end{itemize}
+    \item Communautés\\
+    \textbf{"coupe" à la Louvain et caractéristiques}
+    % \centering
+    % \includegraphics[scale=0.5]{coupe_louvain.pdf}
+\end{itemize}
+
+\section{Robustesse}
+\subsection{Métriques d'impact}
+\begin{itemize}
+    \item eBC et average eBC
+    \item SCC et CC
+    \item Efficacité
+    \item Résistance effective
+\end{itemize}
+
+A chaque fois définition et intuition, compléxité pratique et théorique (y penser lorsqu'on base une stratégie dessus)
+
+\subsection{Stratégies}
+
+    Définition et premières analyses des stratégies\\
+    \emph{Classiques}
+    \begin{itemize}
+        \item[-] eBC, itératif vs non itératif
+        \item[-] degré, inefficace sur graphe de ville
+        \item[-] random comme stratégie naïve 
+    \end{itemize}
+    \emph{Basées sur KaHIP}
+    \begin{itemize}
+        \item[-] fréquence, explication et dominance d'un style de coupe
+        \item[-] coupes, imposition d'un ordre dans la coupe \textbf{comparaison bc vs rd}
+    \end{itemize}
+    \emph{Passage à l'échelle}
+    \begin{itemize}
+        \item[-] approximation de la eBC
+        \item[-] itération de la fréquence, changement de imb, de nblock
+    \end{itemize}
+\subsection{Résultats}
+Comparaisons des stratégies entre elles\\
+\textbf{Graphiques des comparaisons par métrique}
+
+\subsection{Autres villes}
+\begin{itemize}
+    \item Manhattan
+    \item Shanghai
+    \item Ville non occidentale ?
+\end{itemize}
+Comparaisons et conclusions inter-villes.
+\end{document}
