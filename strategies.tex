@@ -1,0 +1,33 @@
+\section{Strategies}
+\label{sec:strategies}
+    We defined a strategy on a graph $G = (V, E)$ as a pair $(E', \leq)$ with $E'\subset E$ and $\leq$ an order on the edges of $E'$. Applying a strategy $(E', \leq)$ resides in the repetition of:
+    \begin{enumerate}
+        \item let $e^* = \max_{e\in E'}{e}$
+        \item remove $e^*$ and recompute the order
+    \end{enumerate}Here are the strategies we used in our analysis.
+    \subsection*{State of the art strategies}
+    \begin{itemize}
+        \item[-] \textbf{edge Betweenness Centrality $(E, \leBC)$:}\\
+        Let $eBC: E \to \R$ the classic edge Betweenness Centrality function defined as:
+        $$eBC(e) = \sum_{s, t \in V}\frac{\sigma(s, t | e)}{\sigma(s, t)} \quad e\in E$$
+        With $\sigma(s, t)$ the number of shortest $s-t$ paths.\\
+        So $$\forall (u, v) \in E^2, u \leBC v \text{ when } eBC(u) \leq eBC(v)$$
+
+        \textit{eBC} is always computed on the updated graph.
+        \item[-] \textbf{Maximum Degree $(E, \ldeg)$:}\\
+        Let $deg: E \to \N$ the edge degree fonction defined as: $deg((s, t)) = degree(s) \cdot degree(t),\quad (s, t)\in E$
+        $$\forall (u, v) \in E^2, u \ldeg v \text{ when } deg(u) \leq deg(v)$$
+        \item[-] \textbf{Random $(E, \lrd)$:}\\
+        Let $rd: E \to \N$ be a random injection
+        $$\forall (u, v) \in E^2, u \lrd v \text{ when } rd(u) \leq rd(v)$$
+    \end{itemize}
+    \subsection*{Strategies based on KaHIP}
+    \begin{itemize}
+        \item[-] \textbf{frequency $(E, \lfreq)$:}\\
+        Let $i \in  [0, 1]$ and $k \in \N$. We define $freq_{i, k}: E \to [0, 1]$ the function such that for a $N$ cuts in $k$ blocks with imbalance $i$ it maps to each edge $e \in E$ its occurence frequency.
+        $$\forall (u, v) \in E^2, u \lfreq v \text{ when } freq_{i, k}(u) \leq freq_{i, k}(v)$$
+        \item[-] \textbf{cut $n$ $(E_n, \leq_o)$:}\\
+        Let $n$ be a cut id. $E_n \subset E$ the set of edges corresponding to the cut. And $o$ being an order such that $o \in \{eBC, deg, rd\}$
+    \end{itemize}
+    \textbf{$N$ parameter for frequency}\\
+    For smaller attacks (untill 50 edges) $N = 1000$, allowing a good overview of the cuts possibilities. For bigger attacks $N = 10$ since it have been tested that bigger values won't drastically change the results.\\

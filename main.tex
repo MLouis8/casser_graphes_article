@@ -1,5 +1,6 @@
 \documentclass{article}
 
+% ---- Packages ----
 \usepackage{graphicx}
 \usepackage[a4paper, total={7in, 10in}]{geometry}
 \usepackage{amsmath}
@@ -7,9 +8,15 @@
 \usepackage[many]{tcolorbox}
 \usepackage{multicol}
 \usepackage{wrapfig}
-% \usepackage{biblatex}
+\usepackage{xargs} % Use more than one optional parameter in a new commands (besoin pour redef todo)
+\usepackage{xspace} % espace après un mot mais pas avant la ponctuation
+\usepackage[linesnumbered,ruled,vlined]{algorithm2e} % écrire du pseudocode
+\usepackage{url}
+\usepackage[bibliography=common]{apxproof} % proofs in appendix ; appendix ref in global biblio (separate by default)
+\usepackage{arydshln} % dashed lines in tables
+% \usepackage{tikz}
+\sloppy % prevent the math mode from overtaking in the margin 
 
-% \addbibresource{refs.bib}
 \graphicspath{{images/}}
 
 \newcommand{\R}{\mathds{R}}
@@ -31,140 +38,34 @@
 
 \title{Title}
 \author{authors}
+\date{date}
 
 \begin{document}
 
 \maketitle
 
-\section{Introduction}
-\begin{itemize}
-    \item road networks, city graph
-    \item graph robustness, attacks as edge removals
-    \item Study of protest and blocking streets
-    \item disruption strategies and centrality measures
-    \item partitioning algorithm
-    \item selection of edges, novel strategies
-\end{itemize}
-
-\section{Related Works}
-\begin{itemize}
-    \item coupes naturelles
-    \item survey sur la robustesse %\cite{clustering}
-    \item survey sur les communautés
-    \item Duan and Lu
-\end{itemize}
-
-\section{Methodology}
-\subsection{Graph \& Model}
-In this paper, we based our work on a Paris graph model. It is built with Open Street Map data with the Python package OSMnx. \textit{We first download OSM data, then project them with epsg:2154, consolidate intersections with a tolerance of 4m and use  350m buffer around Paris.} Resulting from this preprocessing we have a graph of Paris with roads represented as edges and nodes as roads intersections.\\
-Since we used KaHIP for partitioning, we used an undirected and a parallel-edgeless version of the graph.
-
-\subsection{Weight}
-We then weighted the graph by the number of street lanes (a larger road is considered harder to disrupt). OSM Paris data begin quite heterogenous we used the following rules for a weight $w$:
-\begin{enumerate}
-    \item $w =$ number of lanes
-    \item $w =$ \textit{width} $/ 4$
-    \item $w = 3$ if \textit{highway} $\in$ \{\textit{primary, secondary}\} \item $w = 2$ otherwise
-\end{enumerate}
-Knowing that the number of lanes is given for 51\% of the edges, the width 3\% and the \textit{highway} for 100\% (it describes the type of road).\\
-
-\includegraphics[scale=0.5]{degree.pdf}
-\includegraphics[scale=0.5]{lanes_distr.pdf}
-\begin{center}
-    \includegraphics[scale=0.5]{valuation.pdf}
-\end{center}
-
-\section{Partitioning}
-KaHIP or Karlsruhe High Quality Partitioning is a family of graph partitioning programs. In our work we used KaFFPa (Karlsruhe Fast Flow Partitioner) a sequential Multi-level Graph Partitioning scheme, that computes high quality partitions for big graphs when an imbalance $i > 0$ is allowed. \emph{For small imbalances, we observed very small isolated components, which increases artificially the cost of the cut.} In this way we could face a NP hard problem with a fast and good approximation. And we will see later to what extent the edges selected by KaHIP are interresting for our problem.\\
-Since its an approximation, when repeating the cut with different seeds, different cuts may appear. They often reproduce the same pattern, but very different cuts may occur. In order to understand the diversity of the outcomes produced by KaFFPa, we developped a cut clustering method. To face this set-clustering problem, we used the Chamfer distance together with the Louvain clustering algorithm on a distance graph established from a custom treshold. Thanks to this method we easily visualized the many possible partitions created by KaFFPa.\\
-We could have produced the same type of outcomes using clustering detection tools. But using a partitioning point of vue allowed us to manipulate this balancing perspective and removing in the same time any density constraint on the output (something less pertinent on a city graph, where degrees are quite homogenous).
-\begin{multicols}{2}
-    \includegraphics[scale=0.8]{cuts.pdf}
-    \begin{boxB}
-        \begin{center}
-            \emph{Legend:}\\
-            \color{red} cut 190: 42 edges and 114 lanes\\
-            \color{violet} cut 141: 53 edges and 130 lanes\\
-            \color{orange} louvain: 81 edges and 184 lanes
-        \end{center}
-    \end{boxB}
-\end{multicols}
-    
-\section{Robustness}
-\subsection{Impact metrics}
-\subsubsection{Largest Connected Component}
-Classic robustness metric, the bigger the its size is, the more the graph is considered robust.\\
-\textit{Complexity: $O(n)$}
-
-\subsubsection{Efficiency}
-The efficiency of a pair of nodes in a graph is the multiplicative inverse of the shortest path distance between the nodes. The average global efficiency of a graph is the average efficiency of all pairs of nodes. The better the graph is connected, the lesser the average distance is so bigger the efficiency is.\\
-\textit{Complexity: $O(n^2)$}
-
-\subsubsection{Effective Resistance}
-Views the resistance as the electrical resistance between two vertices using Kirchoff's circuit laws. The effective graph resistance is the sum of every vertex pair resistance. But it's computed using the sum of the inverse of non-zero Laplacian eigenvalues.
-$$R = n \sum_{i=2}^n\frac{1}{\mu_i}$$
-It measures the graph connectivity taking into account both the number of paths between node pairs and their length.\\
-\textit{Complexity: $O(n^3)$}
+%TODO mandatory: add short abstract of the document
+\begin{abstract}
+  \input{abstract}
+\end{abstract}
 
 
-\subsection{Strategies}
-    We defined a strategy on a graph $G = (V, E)$ as a pair $(E', \leq)$ with $E'\subset E$ and $\leq$ an order on the edges of $E'$. Applying a strategy $(E', \leq)$ resides in the repetition of:
-    \begin{enumerate}
-        \item let $e^* = \max_{e\in E'}{e}$
-        \item remove $e^*$ and recompute the order
-    \end{enumerate}Here are the strategies we used in our analysis.
-    \subsubsection{State of the art strategies}
-    \begin{itemize}
-        \item[-] \textbf{edge Betweenness Centrality $(E, \leBC)$:}\\
-        Let $eBC: E \to \R$ the classic edge Betweenness Centrality function defined as:
-        $$eBC(e) = \sum_{s, t \in V}\frac{\sigma(s, t | e)}{\sigma(s, t)} \quad e\in E$$
-        With $\sigma(s, t)$ the number of shortest $s-t$ paths.\\
-        So $$\forall (u, v) \in E^2, u \leBC v \text{ when } eBC(u) \leq eBC(v)$$
+% \comab{12 pages hors ref et annexes. \\ Article: 19 mai}
 
-        \textit{eBC} is always computed on the updated graph.
-        \item[-] \textbf{Maximum Degree $(E, \ldeg)$:}\\
-        Let $deg: E \to \N$ the edge degree fonction defined as: $deg((s, t)) = degree(s) \cdot degree(t),\quad (s, t)\in E$
-        $$\forall (u, v) \in E^2, u \ldeg v \text{ when } deg(u) \leq deg(v)$$
-        \item[-] \textbf{Random $(E, \lrd)$:}\\
-        Let $rd: E \to \N$ be a random injection
-        $$\forall (u, v) \in E^2, u \lrd v \text{ when } rd(u) \leq rd(v)$$
-    \end{itemize}
-    \subsubsection{Strategies based on KaHIP}
-    \begin{itemize}
-        \item[-] \textbf{frequency $(E, \lfreq)$:}\\
-        Let $i \in  [0, 1]$ and $k \in \N$. We define $freq_{i, k}: E \to [0, 1]$ the function such that for a $N$ cuts in $k$ blocks with imbalance $i$ it maps to each edge $e \in E$ its occurence frequency.
-        $$\forall (u, v) \in E^2, u \lfreq v \text{ when } freq_{i, k}(u) \leq freq_{i, k}(v)$$
-        \item[-] \textbf{cut $n$ $(E_n, \leq_o)$:}\\
-        Let $n$ be a cut id. $E_n \subset E$ the set of edges corresponding to the cut. And $o$ being an order such that $o \in \{eBC, deg, rd\}$
-    \end{itemize}
-\subsection{Results}
-\subsubsection{Preliminary Results}
-\textbf{Iterative eBC vs non iterative eBC}\\
-\vspace{1pt}\\
-The use of iterative eBC computations is expensive but necessary. A first order on the eBC shows zones of multiple edges with high eBC. And cutting the biggest eBC edge reduces the eBC in all the area, making useless other cuts in the same zone. For this reason we always recompute the eBC. For big attacks, an approximation is made with 1000 random samples.\\
-\vspace{1pt}\\
-\textbf{Order importance in cuts}\\
-\begin{wrapfigure}[12]{l}{0.25\textwidth}
-    \includegraphics[scale=0.6]{rdvsebc.pdf}\\
-\end{wrapfigure}\\
-\vspace{10pt}\\
-On this graphic we compare the efficiency evolution while removing 50 edges. We observe a difference between the blue and orange curve and between the green and red one. Even though each pair belongs to the same cut (edge set) the order in which the removal is done impacts the efficiency. Obviously when all the edges of a cut are removed (it's the case for cut 190, which contains 43 edges), both orders show a drop in efficiency. For further comparisons, only eBC orders will be shown on cuts since they behave better for all metrics.\\
-\vspace{50pt}\\
-\textbf{$N$ parameter for frequency}\\
-For smaller attacks (untill 50 edges) $N = 1000$, allowing a good overview of the cuts possibilities. For bigger attacks $N = 10$ since it have been tested that bigger values won't drastically change the results.\\
-\subsubsection{Strategies comparison}
-\textbf{Largest Connected Component analysis}\\
-\includegraphics[scale=0.5, trim=3cm 0 0 0]{ccs.pdf}
-In the first figure, we compare different imbalances. A bigger imbalance allows to cut faster by realeasing the constraint but in the same time to cut in bigger components. So a big imbalance may generally be a good solution even in smaller sized attacks. In the second figure, we compare different numbers of blocks expected after the cut. Once again the choice of the number of blocks could vary between 2 and 3 according to the attack size. And finally we compare some of our results wit the state of the art strategies. Max degree and random strategies won't disrupt the largest connected component with so few edges removed. The edge BC strategy surprisingly finds a "cut" but long after the KaHIP based strategies.
-\vspace{10pt}\\
-\textbf{Efficiency analysis}\\
-\begin{wrapfigure}[19]{l}{0.25\textwidth}
-    \includegraphics[scale=0.6]{efficiency1(cutbc).pdf}
-\end{wrapfigure}\\
-\vspace{10pt}\\
-We observe two groups of efficiencies, the first contains every classic strategies and the second every KaHIP based strategies. In the first group, random and degree strategies perform quite the same, confirming the unsuitability of degree based strategies in city graphs. In the second group, the frequency and cut190 curves undergo a big drop around the 40th edge. This corresponds to the moment the graph is cut in two smaller components. But the separation in two groups is even visible before the big drop, meaning that the edge selected by KaHIP based strategies are also individualy important. When comparing KaHIP strategies, when can at first assume that the faster to cut the better, but considering smaller sized attacks, looking at the diversity of the cuts could be interresting. Here the cut141, bigger and more expensive has a bigger impact on efficiency before the 38th edge.\\
-\textbf{Effective resistance analysis}
+\input{introduction}
+\input{methodology}
+\input{strategies}
+\input{results}
+\input{conclusion}
 
-\section{Conclusion}
-% \printbibliography
+%%
+%% Bibliography
+%%
+
+%% Please use bibtex, 
+\bibliography{biblio}
+
+% Appendix (proofs already added to appendix)
+\counterwithin{figure}{section}
+
 \end{document}

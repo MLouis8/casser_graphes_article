@@ -1,0 +1,25 @@
+\section{Results}
+\label{sec:results}
+
+\subsection{Preliminary Results}
+
+\textbf{Order importance in cuts}\\
+\begin{wrapfigure}[12]{l}{0.25\textwidth}
+    \includegraphics[scale=0.6]{rdvsebc.pdf}\\
+\end{wrapfigure}\\
+\vspace{10pt}\\
+On this graphic we compare the efficiency evolution while removing 50 edges. We observe a difference between the blue and orange curve and between the green and red one. Even though each pair belongs to the same cut (edge set) the order in which the removal is done impacts the efficiency. Obviously when all the edges of a cut are removed (it's the case for cut 190, which contains 43 edges), both orders show a drop in efficiency. For further comparisons, only eBC orders will be shown on cuts since they behave better for all metrics.\\
+\vspace{50pt}\\
+
+\subsection{Strategies comparison}
+\textbf{Largest Connected Component analysis}\\
+\includegraphics[scale=0.5, trim=3cm 0 0 0]{ccs.pdf}
+In the first figure, we compare different imbalances. A bigger imbalance allows to cut faster by realeasing the constraint but in the same time to cut in bigger components. So a big imbalance may generally be a good solution even in smaller sized attacks. In the second figure, we compare different numbers of blocks expected after the cut. Once again the choice of the number of blocks could vary between 2 and 3 according to the attack size. And finally we compare some of our results wit the state of the art strategies. Max degree and random strategies won't disrupt the largest connected component with so few edges removed. The edge BC strategy surprisingly finds a "cut" but long after the KaHIP based strategies.
+\vspace{10pt}\\
+\textbf{Efficiency analysis}\\
+\begin{wrapfigure}[19]{l}{0.25\textwidth}
+    \includegraphics[scale=0.6]{efficiency1(cutbc).pdf}
+\end{wrapfigure}\\
+\vspace{10pt}\\
+We observe two groups of efficiencies, the first contains every classic strategies and the second every KaHIP based strategies. In the first group, random and degree strategies perform quite the same, confirming the unsuitability of degree based strategies in city graphs. In the second group, the frequency and cut190 curves undergo a big drop around the 40th edge. This corresponds to the moment the graph is cut in two smaller components. But the separation in two groups is even visible before the big drop, meaning that the edge selected by KaHIP based strategies are also individualy important. When comparing KaHIP strategies, when can at first assume that the faster to cut the better, but considering smaller sized attacks, looking at the diversity of the cuts could be interresting. Here the cut141, bigger and more expensive has a bigger impact on efficiency before the 38th edge.\\
+\textbf{Effective resistance analysis}
