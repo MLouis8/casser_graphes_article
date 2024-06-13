@@ -1,25 +1,68 @@
 \section{Results}
 \label{sec:results}
 
-\subsection{Preliminary Results}
+When using the cut strategy, even though the cut has a defined size, it's important to use a good order on the edges. When looking at metrics evolution, the biggest change is often when the cut is entirely done (all the edges are removed), but adding a good order optimizes the intermediary steps. This could be interresting when a small attack is considered. In the Figure~\ref{fig:efficiency-rd-vs-bc} we compared efficiency values for cut141 and cut190, both with rd and eBC orders (see section \ref{sec:strategies} for orders). A clear gap in efficiency is seen, in favor of the eBC order. Showing in the same time that among the cut, there some edges are more "important" than others.
 
-\textbf{Order importance in cuts}\\
-\begin{wrapfigure}[12]{l}{0.25\textwidth}
-    \includegraphics[scale=0.6]{rdvsebc.pdf}\\
-\end{wrapfigure}\\
-\vspace{10pt}\\
-On this graphic we compare the efficiency evolution while removing 50 edges. We observe a difference between the blue and orange curve and between the green and red one. Even though each pair belongs to the same cut (edge set) the order in which the removal is done impacts the efficiency. Obviously when all the edges of a cut are removed (it's the case for cut 190, which contains 43 edges), both orders show a drop in efficiency. For further comparisons, only eBC orders will be shown on cuts since they behave better for all metrics.\\
-\vspace{50pt}\\
+\begin{figure}[!hbt]
+    \centering
+    \includegraphics[scale=0.5]{rdvsebc.pdf}
+    \caption{Efficiency comparison of two different orders on two different cuts}
+    \label{fig:efficiency-rd-vs-bc}
+\end{figure}
 
-\subsection{Strategies comparison}
-\textbf{Largest Connected Component analysis}\\
-\includegraphics[scale=0.5, trim=3cm 0 0 0]{ccs.pdf}
-In the first figure, we compare different imbalances. A bigger imbalance allows to cut faster by realeasing the constraint but in the same time to cut in bigger components. So a big imbalance may generally be a good solution even in smaller sized attacks. In the second figure, we compare different numbers of blocks expected after the cut. Once again the choice of the number of blocks could vary between 2 and 3 according to the attack size. And finally we compare some of our results wit the state of the art strategies. Max degree and random strategies won't disrupt the largest connected component with so few edges removed. The edge BC strategy surprisingly finds a "cut" but long after the KaHIP based strategies.
-\vspace{10pt}\\
-\textbf{Efficiency analysis}\\
-\begin{wrapfigure}[19]{l}{0.25\textwidth}
-    \includegraphics[scale=0.6]{efficiency1(cutbc).pdf}
-\end{wrapfigure}\\
-\vspace{10pt}\\
-We observe two groups of efficiencies, the first contains every classic strategies and the second every KaHIP based strategies. In the first group, random and degree strategies perform quite the same, confirming the unsuitability of degree based strategies in city graphs. In the second group, the frequency and cut190 curves undergo a big drop around the 40th edge. This corresponds to the moment the graph is cut in two smaller components. But the separation in two groups is even visible before the big drop, meaning that the edge selected by KaHIP based strategies are also individualy important. When comparing KaHIP strategies, when can at first assume that the faster to cut the better, but considering smaller sized attacks, looking at the diversity of the cuts could be interresting. Here the cut141, bigger and more expensive has a bigger impact on efficiency before the 38th edge.\\
-\textbf{Effective resistance analysis}
+Often eBC strategy show good results compared to a naive approach. But it actually depends on what we're looking at. For the effective resistance, rd and eBC strategies have quite similar results (see Figure~\ref{fig:er-classic}).
+
+\begin{figure}[!hbt]
+    \centering
+    \includegraphics[scale=0.5]{er-classic.pdf}
+    \caption{effective resistance evolution for state of the art strategies}
+    \label{fig:er-classic}
+\end{figure}
+
+When using the frequency strategy the parameters configurations have a strong impact on the robustness metrics. A big imbalance ($i$) (above 20\%), allows to cut faster by realeasing the constraint but in the same time to cut in bigger components (see Figure~\ref{fig:lcc-freq-imb}). So a big imbalance may generally be a good solution even in small sized attacks. For the number of blocks ($k$), the choice could vary between 2 and 3 according to the attack size since a smaller $k$ allows a faster drop but in bigger components (see Figure~\ref{fig:lcc-freq-nblocks}).
+
+\begin{figure}[!hbt]
+    \centering
+    \includegraphics[scale=0.5]{lcc-imb.pdf}
+    \caption{LCC of frequency strategy with different imbalances}
+    \label{fig:lcc-freq-imb}
+\end{figure}
+
+\begin{figure}[!hbt]
+    \centering
+    \includegraphics[scale=0.5]{lcc-nblocks.pdf}
+    \caption{LCC of frequency strategy with different nblocks}
+    \label{fig:lcc-freq-nblocks}
+\end{figure}
+
+Because of the balancing constraint, cuts are forced to add more edges to ensure a perfectly (within the imbalance parameter) balanced cut. So the frequency strategy, that may seem more naive generally cuts faster. For $i = 0.05$, $k = 2$ the frequency strategy obtains a cut after 38 edges removed better than the cuts results (see Figure~\ref{fig:cuts}). But the cut quality isn't the only parameter to look at. Larger cuts may have better results as our 190th cut, which is more expensive than cut 141 and frequency cut, performs well in Figure~\ref{fig:efficiency-kahip} before the cut drop.
+
+\begin{figure}[!hbt]
+    \centering
+    \includegraphics[scale=0.5]{efficiency-kahip.pdf}
+    \caption{efficiencies evolution for KaHIP-based strategies}
+    \label{fig:efficiency-kahip}
+\end{figure}
+
+After refinement of our parameters and a first analysis between KaHIP strategies, we can compare them to the state of the art. Max degree and random strategies don't disrupt the largest connected component with a 200 edges attack. Even a strategy based on a good centrality measure doesn't stand a chance (see Figure~\ref{fig:lcc-strats}) when compared to the frequency strategy in terms of LCC. The same phenomena is observed with the efficiency and effective resistance. Cutting the graph causes a 32\% drop in efficiency (Figure~\ref{fig:efficiency-final}) and a 90\% jump in effective resistance (Figure~\ref{fig:er-final}). And since the beginning of the attacks, KaHIP based strategies behave better than any other state of the art strategies. Showing that not only a partition based strategy chooses a better group of edges, but also individualy important edges.
+
+\begin{figure}[!hbt]
+    \centering
+    \includegraphics[scale=0.5]{lcc-final.pdf}
+    \caption{LCC comparison for different strategies}
+    \label{fig:lcc-strats}
+\end{figure}
+
+\begin{figure}[!hbt]
+    \centering
+    \includegraphics[scale=0.5]{efficiency-final.pdf}
+    \caption{efficiencies evolution for multiple strategies}
+    \label{fig:efficiency-final}
+\end{figure}
+
+\begin{figure}[!hbt]
+    \centering
+    \includegraphics[scale=0.5]{er-final.pdf}
+    \caption{effective resistance evolution for multiple strategies}
+    \label{fig:er-final}
+\end{figure}

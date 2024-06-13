@@ -12,9 +12,19 @@
 \usepackage{xspace} % espace après un mot mais pas avant la ponctuation
 \usepackage[linesnumbered,ruled,vlined]{algorithm2e} % écrire du pseudocode
 \usepackage{url}
-\usepackage[bibliography=common]{apxproof} % proofs in appendix ; appendix ref in global biblio (separate by default)
-\usepackage{arydshln} % dashed lines in tables
-% \usepackage{tikz}
+\usepackage{amsthm}
+\usepackage[backend=biber,style=alphabetic]{biblatex}
+% \ExecuteBibliographyOptions{sortcites,sorting=nyt,%name/year/t
+% maxnames=3,minnames=3,backref,date=year}
+
+\addbibresource{biblio.bib}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
+
+\newtheorem{definition}[theorem]{Definition}
+
 \sloppy % prevent the math mode from overtaking in the margin 
 
 \graphicspath{{images/}}
@@ -51,7 +61,6 @@
 
 
 % \comab{12 pages hors ref et annexes. \\ Article: 19 mai}
-
 \input{introduction}
 \input{methodology}
 \input{strategies}
@@ -62,8 +71,7 @@
 %% Bibliography
 %%
 
-%% Please use bibtex, 
-\bibliography{biblio}
+\printbibliography
 
 % Appendix (proofs already added to appendix)
 \counterwithin{figure}{section}

@@ -2,32 +2,62 @@
 \label{sec:methodology}
 
 \subsection*{Graph \& Model}
-In this paper, we based our work on a Paris graph model. It is built with Open Street Map data with the Python package OSMnx. \textit{We first download OSM data, then project them with epsg:2154, consolidate intersections with a tolerance of 4m and use  350m buffer around Paris.} Resulting from this preprocessing we have a graph of Paris with roads represented as edges and nodes as roads intersections. Its specifications can be found in \textbf{figure}. Since we used KaHIP for partitioning, we used an undirected and a parallel-edgeless version of the graph.
+In this paper, we based our work on a Paris graph model. It is built with Open Street Map data with the Python package OSMnx. After a small preprocessing we have a graph of Paris with roads represented as edges and nodes as roads intersections. With the specifications in Figure~\ref{fig:characterization}. Since we used KaHIP for partitioning, we used an undirected and a parallel-edgeless version of the graph.
+\begin{figure}[!hbt]
+    \begin{center}
+        \begin{tabular}{ | c c | }
+        \hline
+         \# of vertices & 40593 \\
+        \hline 
+         \# of edges & 46759 \\
+        \hline
+         avg. degree & 2.3 \\
+        \hline
+        \end{tabular}
+        \caption{Paris network characterization}
+        \label{fig:characterization}
+    \end{center}
+\end{figure}
 
 \subsection*{Weight}
-We then weighted the graph by the number of street lanes (a larger road is considered harder to disrupt). OSM Paris data begin quite heterogenous we used the following rules for a weight $w$:
+We then weighted the graph by the number of street lanes (a larger road is considered harder to disrupt). OSM Paris data begin quite heterogenous we used the following rules for a weight $w$ (taking the first rule where the parameter is given):
 \begin{enumerate}
     \item $w =$ number of lanes
     \item $w =$ \textit{width} $/ 4$
     \item $w = 3$ if \textit{highway} $\in$ \{\textit{primary, secondary}\} \item $w = 2$ otherwise
 \end{enumerate}
-Knowing that the number of lanes is given for 51\% of the edges, the width 3\% and the \textit{highway} for 100\% (it describes the type of road).\\
+Keeping in mind that the number of lanes is given for 51\% of the edges, the width 3\% and the \textit{highway} for 100\% (it describes the type of road). We obtain the weight distribution of Figure~\ref{fig:lanes}.
 
-\includegraphics[scale=0.5]{degree.pdf}
-\includegraphics[scale=0.5]{lanes_distr.pdf}
+\begin{figure}
+    \centering
+    \includegraphics[scale=0.5]{degree.pdf}
+    \caption{Paris network degree distribution}
+    \label{fig:degree}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[scale=0.5]{lanes_distr.pdf}
+    \caption{Paris network weight distribution}
+    \label{fig:lanes}
+\end{figure}
+
 % \begin{center}
 %     \includegraphics[scale=0.5]{valuation.pdf}
 % \end{center}
 
-
-\begin{multicols}{2}
-    \includegraphics[scale=0.8]{cuts.pdf}
-    \begin{boxB}
-        \begin{center}
-            \emph{Legend:}\\
-            \color{red} cut 190: 42 edges and 114 lanes\\
-            \color{violet} cut 141: 53 edges and 130 lanes\\
-            \color{orange} louvain: 81 edges and 184 lanes
-        \end{center}
-    \end{boxB}
-\end{multicols}
+\begin{figure}
+    \begin{multicols}{2}
+        \includegraphics[scale=0.8]{cuts.pdf}
+        \begin{boxB}
+            \begin{center}
+                \emph{Legend:}\\
+                \color{red} cut 190: 42 edges and 114 lanes\\
+                \color{violet} cut 141: 53 edges and 130 lanes\\
+                \color{orange} louvain: 81 edges and 184 lanes
+            \end{center}
+        \end{boxB}
+    \end{multicols}
+    \caption{Paris network with 3 different cuts and their characteristics}
+    \label{fig:cuts}
+\end{figure}
